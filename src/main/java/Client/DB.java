@@ -1,4 +1,4 @@
-package sample;
+package Client;
 
 import IndividualInformation.Account;
 import java.io.ObjectInputStream;

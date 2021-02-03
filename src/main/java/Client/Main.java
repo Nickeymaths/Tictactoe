@@ -1,16 +1,12 @@
-package sample;
+package Client;
 
 import IndividualInformation.Account;
 import javafx.application.Application;
-import javafx.event.Event;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
@@ -24,8 +20,6 @@ public class Main extends Application {
     private final String host = "localhost";
     private final int PORT = 455;
     public static Socket clientSocket;
-//    public static  ObjectInputStream is;
-//    public static ObjectOutputStream os;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -73,10 +67,6 @@ public class Main extends Application {
                             ObjectOutputStream ObjOs = new ObjectOutputStream(byteOs);
                             ObjOs.writeObject(message);
                             clientSocket.getOutputStream().write(byteOs.toByteArray());
-//                            os = new ObjectOutputStream(clientSocket.getOutputStream());
-                            // Stream has initial data AC ED 00 05 at OutputStream -> flush()
-//                            os.flush();
-//                            is = new ObjectInputStream(clientSocket.getInputStream());
 
                             gameFramework.run();
                         } else {

@@ -4,19 +4,17 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
-    private int posX;
-    private int posY;
+    private String data;
     private int PORT;
 
-    public Message(int posX, int posY, int PORT) {
-        this.posX = posX;
-        this.posY = posY;
+    public Message(String data, int PORT) {
+        this.data = data;
         this.PORT = PORT;
     }
 
     @Override
     public String toString() {
-        return "Position=[PosX = " + posX + ", Posy = " + posY
+        return "Position=[Message= " + data
                 + ", PORT = " + PORT;
     }
 }

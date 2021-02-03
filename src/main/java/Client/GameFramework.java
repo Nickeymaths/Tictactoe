@@ -1,4 +1,4 @@
-package sample;
+package Client;
 
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
