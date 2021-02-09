@@ -47,6 +47,6 @@ public class Date implements Serializable {
 
     @Override
     public String toString() {
-        return "Date: " + dd + "/" + mm + "/" + "yy" + yy;
+        return dd + "/" + mm + "/" + yy;
     }
 }

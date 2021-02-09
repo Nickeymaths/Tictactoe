@@ -12,22 +12,22 @@ import javafx.scene.layout.*;
 
 import java.io.*;
 
-public class GameFramework {
+public class InGame {
     private final int N = 20;
     private Scene scene;
     Button[][] buttons = new Button[N][N];
     private boolean turn = Turn.PLAYER1_TURN;
     private boolean hasNewTurn = true;
 
-    public GameFramework() {
+    public InGame() {
         try {
-            initialGameFrame();
+            initialLookAndFeel();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void initialGameFrame() throws Exception {
+    public void initialLookAndFeel() throws Exception {
         SplitPane splitFrame = new SplitPane();
         GridPane boardGamePane = new GridPane();
         VBox playerArea = new VBox();
@@ -96,7 +96,7 @@ public class GameFramework {
         scene = new Scene(splitFrame, Main.WIDTH, Main.HEIGHT);
     }
 
-    public Scene getGameFramework() {
+    public Scene getScene() {
         return scene;
     }
 
@@ -113,7 +113,7 @@ public class GameFramework {
                 mouseClickEvent[i][j] = new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        try {
+                        /*try {
                             if (Main.clientSocket.getInputStream().available() != 0) {
                                 byte[] reader = new byte[4096];
                                 Main.clientSocket.getInputStream().read(reader);
@@ -124,9 +124,9 @@ public class GameFramework {
                                 hasNewTurn = true;
                             } else {
                                 hasNewTurn = false;
-                            }
+                            }*/
 
-                            if (hasNewTurn) {
+//                            if (hasNewTurn) {
                                 if (turn == Turn.PLAYER1_TURN) {
                                     // Mark X
                                     buttons[finalI][finalJ].setText("X");
@@ -139,16 +139,16 @@ public class GameFramework {
                                     System.out.println(checkWin(finalI, finalJ, "O"));
                                 }
                                 turn = !turn;
-                                String message = String.valueOf(finalI) + (finalJ);
+                                /*String message = String.valueOf(finalI) + (finalJ);
 
                                 ByteArrayOutputStream byteOs = new ByteArrayOutputStream(4096);
                                 ObjectOutputStream ObjOs = new ObjectOutputStream(byteOs);
                                 ObjOs.writeObject(message);
-                                Main.clientSocket.getOutputStream().write(byteOs.toByteArray());
-                            }
-                        } catch(Exception e) {
+                                Main.clientSocket.getOutputStream().write(byteOs.toByteArray());*/
+//                            }
+                        /*} catch(Exception e) {
                             e.printStackTrace();
-                        }
+                        }*/
                     }
                 };
                 buttons[i][j].addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickEvent[i][j]);

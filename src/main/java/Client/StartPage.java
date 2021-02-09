@@ -1,6 +1,7 @@
 package Client;
 
 import IndividualInformation.Account;
+import IndividualInformation.Date;
 import IndividualInformation.Sex;
 import javafx.collections.ObservableList;;
 import javafx.event.EventHandler;
@@ -187,16 +188,24 @@ public class StartPage {
         return usernameFieldLogin.getText();
     }
 
+    public TextField getUsernameFieldLogin() {
+        return usernameFieldLogin;
+    }
+
     public String getPasswordLogin() {
         return passwordFieldLogin.getText();
     }
 
+    public PasswordField getPasswordFieldLogin() {
+        return passwordFieldLogin;
+    }
+
     public Account getAccount() {
         boolean sex = maleButton.isSelected()? Sex.MALE : Sex.FEMALE;
-        if (!Main.database.isAlreadyHasUsername(usernameFieldReg.getText())) {
+        if (!Main.serverManage.isContain(usernameFieldReg.getText())) {
             if (passwordFieldReg.getText().equals(confirmPasswordReg.getText())) {
                 return new Account(usernameFieldReg.getText(), passwordFieldReg.getText()
-                        , fullNameReg.getText(), sex, dateReg.getEditor().getText());
+                        , fullNameReg.getText(), sex, new Date(dateReg.getEditor().getText()));
             } else {
                 System.out.println("Confirm password is not same");
             }
