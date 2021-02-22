@@ -17,9 +17,23 @@ public class ServerManage {
         db.INSERT(account);
     }
 
-    public boolean isContain(String username) {
+    public void insertIntoDB(int socketPort) {
+        db.INSERT(socketPort);
+    }
+
+    public void delete(int socketPort) {
+        db.DELETE(socketPort);
+    }
+
+    public boolean isContains(String username) {
         if (db.getAccount(username) != null) return true;
         return false;
+    }
+
+    public boolean isContains(int socketPort) {
+        boolean result = db.isContains(socketPort);
+        System.out.println(result);
+        return result;
     }
 
     public Account getAccount(String username) {
@@ -35,10 +49,16 @@ public class ServerManage {
     }
 
     public Room createRoom(String usernameOfOwner, int ownerPort) {
-        Room newRoom = new Room(++number_of_room, 1, usernameOfOwner, ownerPort);
-        db.INSERT_ROOM(newRoom);
+        // Room id is socket port of owner
+        Room newRoom = new Room(ownerPort, 1, usernameOfOwner, ownerPort);
+        db.INSERT(newRoom);
         number_of_room++;
         return newRoom;
+    }
+
+    public void delete(Room room) {
+        db.DELETE(room);
+        number_of_room--;
     }
 
     public List<Room> getRoomList() {

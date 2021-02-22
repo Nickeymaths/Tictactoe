@@ -2,14 +2,15 @@ package Data;
 
 import java.io.Serializable;
 
-public class LogIOSignal extends Data {
+public class LoginSignal extends Data {
     private static final long serialVersionUID = 1L;
     private String username;
     private boolean isActive;
     private boolean isInGame;
 
-    public LogIOSignal(String username, boolean isActive, boolean isInGame, int PORT) {
-        super(PORT);
+    public LoginSignal(String username, boolean isActive,
+                       boolean isInGame, int receiverPORT, int senderPORT) {
+        super(receiverPORT, senderPORT);
         this.username = username;
         this.isActive = isActive;
         this.isInGame = isInGame;

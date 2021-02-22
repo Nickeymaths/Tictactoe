@@ -4,6 +4,7 @@ import Client.Main;
 import IndividualInformation.Account;
 import IndividualInformation.Date;
 import Server.Room;
+import com.mysql.cj.protocol.Resultset;
 import javafx.scene.image.Image;
 import javafx.util.Pair;
 
@@ -15,21 +16,9 @@ import java.util.List;
 public class DB {
     private Connection connection;
     private String url = "jdbc:mysql://localhost:3306/mydata";
-    private PreparedStatement preparedStatement_accountTable;
-    private PreparedStatement preparedStatement_roomTable;
 
     public DB() {
         connection = getConnect();
-        try {
-            preparedStatement_accountTable = connection.prepareStatement(
-                    "INSERT INTO Account(Username, Password, FullName, " +
-                            "DOB, Male, WinMatch, LossMatch, isActive, isInMatch) Value(?,?,?,?,?,?,?,?,?)");
-            preparedStatement_roomTable = connection.prepareStatement(
-                    "INSERT INTO Room(Id, Amount, OwnerUsername, " +
-                            "OtherUsername, OwnerPort, OtherPort) Value(?,?,?,?,?,?)");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     public Connection getConnect() {
@@ -44,6 +33,9 @@ public class DB {
 
     public void INSERT(Account account) {
         try {
+            PreparedStatement preparedStatement_accountTable = connection.prepareStatement(
+                    "INSERT INTO Account(Username, Password, FullName, " +
+                            "DOB, Male, WinMatch, LossMatch, isActive, isInMatch) Value(?,?,?,?,?,?,?,?,?)");
             preparedStatement_accountTable.setString(1, account.getUsername());
             preparedStatement_accountTable.setString(2, account.getPassword());
             preparedStatement_accountTable.setString(3, account.getFullName());
@@ -62,10 +54,10 @@ public class DB {
     }
 
     public Account getAccount(String username) {
-        Statement statement = null;
         try {
-            statement = connection.createStatement();
-            ResultSet result =  statement.executeQuery("SELECT* FROM Account WHERE username = '" + username + "';");
+            PreparedStatement statement
+                    = connection.prepareStatement("SELECT* FROM Account WHERE username = '" + username + "';");
+            ResultSet result =  statement.executeQuery();
             if (result.next()) {
                 String password = result.getString("Password");
                 String fullName = result.getString("FullName");
@@ -83,22 +75,6 @@ public class DB {
         }
         return null;
     }
-
-//    public Pair<Boolean, Boolean> getAccountState(String username) {
-//        Statement statement = null;
-//        try {
-//            statement = connection.createStatement();
-//            ResultSet result =  statement.executeQuery("SELECT isActive, isInGame FROM Account WHERE username = '" + username + "';");
-//            if (result.next()) {
-//                Boolean isActive = result.getBoolean("isActive");
-//                Boolean isInGame = result.getBoolean("isInGame");
-//                return new Pair<>(isActive, isInGame);
-//            }
-//        } catch(Exception e) {
-//            System.out.println("Error to determine state");
-//        }
-//        return null;
-//    }
 
     public void UPDATE_ACTIVE_STATE(String username, boolean state) {
         Statement statement = null;
@@ -125,15 +101,14 @@ public class DB {
     }
 
     public List<Account> getActiveAccount() {
-        Statement statement = null;
         List<String> usernameList = null;
         List<Account> activeAccountList = null;
         try {
             usernameList = new ArrayList<>();
             activeAccountList = new ArrayList<>();
 
-            statement = connection.createStatement();
-            ResultSet result =  statement.executeQuery("SELECT Username FROM Account WHERE isActive = true;");
+            PreparedStatement statement = connection.prepareStatement("SELECT Username FROM Account WHERE isActive = true;");
+            ResultSet result =  statement.executeQuery();
             while (result.next()) {
                 Account account = getAccount(result.getString("Username"));
                 if (!account.equals(Main.currentAccount)) activeAccountList.add(account);
@@ -145,8 +120,11 @@ public class DB {
         return activeAccountList;
     }
 
-    public void INSERT_ROOM(Room room) {
+    public void INSERT(Room room) {
         try {
+            PreparedStatement preparedStatement_roomTable = connection.prepareStatement(
+                    "INSERT INTO Room(Id, Amount, OwnerUsername, " +
+                            "OtherUsername, OwnerPort, OtherPort) Value(?,?,?,?,?,?)");
             preparedStatement_roomTable.setInt(1, room.getId());
             preparedStatement_roomTable.setInt(2, room.getAmount());
             preparedStatement_roomTable.setString(3, room.getUsernameOfOwner());
@@ -160,14 +138,25 @@ public class DB {
         }
     }
 
+    public void DELETE(Room room) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+              "DELETE FROM Room WHERE Id = " + room.getId()
+            );
+            statement.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            System.out.println("Error to delete room");
+        }
+    }
+
     public List<Room> getRooms() {
-        Statement statement = null;
         List<Room> roomList = null;
         try {
             roomList = new ArrayList<>();
 
-            statement = connection.createStatement();
-            ResultSet result =  statement.executeQuery("SELECT* FROM Room;");
+            PreparedStatement statement = connection.prepareStatement("SELECT* FROM Room;");
+            ResultSet result =  statement.executeQuery();
             while (result.next()) {
                 int id = result.getInt("Id");
                 int amount = result.getInt("Amount");
@@ -184,6 +173,38 @@ public class DB {
         }
         return roomList;
     }
+
+    public void INSERT(int socketPort) {
+        try {
+            PreparedStatement preparedStatement_socketPort
+                    = connection.prepareStatement("INSERT INTO client_socket(Port) VALUE(?)");
+            preparedStatement_socketPort.setInt(1, socketPort);
+            preparedStatement_socketPort.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void DELETE(int socketPort) {
+        try{
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM client_socket WHERE Port = "
+                    + socketPort);
+            statement.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isContains(int socketPort) {
+        try {
+            PreparedStatement statement = connection.prepareStatement("SELECT Port FROM client_socket WHERE Port = " + socketPort);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
-/*INSERT INTO Room(Id, Amount, OwnerUsername, " +
-                            "OtherUsername, OwnerPort, OtherPort) Value(?,?,?,?,?,?)");*/

@@ -13,15 +13,25 @@ public class ServerWorkComponent extends Thread {
     }
 
     private Socket socket;
+    private boolean exit = false;
 
     @Override
     public void run() {
         try {
             socket.getOutputStream().flush();
 
-            while (socket.isConnected()) {
+            while (!exit && !socket.isClosed()) {
                 Data comeData = receive(socket);
                 send(comeData);
+                if (comeData instanceof LoginSignal || comeData instanceof LogoutSignal) {
+                    System.out.println(ServerSocketHandler.socketList);
+                    if (comeData instanceof LogoutSignal) {
+                        ServerSocketHandler.socketList.remove(comeData.getSenderPORT());
+                        exit = true;
+                        System.out.println("New socket list");
+                        System.out.println(ServerSocketHandler.socketList);
+                    }
+                }
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -44,10 +54,23 @@ public class ServerWorkComponent extends Thread {
 
         ObjOs.writeObject(message);
 
-        if (message instanceof LogIOSignal || message instanceof CreateRoomSignal) {
+        if (message instanceof LoginSignal || message instanceof LogoutSignal) {
             for (Socket socket : ServerSocketHandler.socketList.values()) {
-                socket.getOutputStream().write(byteOs.toByteArray());
+                if (!socket.isClosed()) socket.getOutputStream().write(byteOs.toByteArray());
+            }
+            if (message instanceof LogoutSignal) exit();
+        } else if (message instanceof CreateRoomSignal || message instanceof QuitRoomSignal) {
+            for (Socket socket : ServerSocketHandler.socketList.values()) {
+                if (!socket.isClosed()) socket.getOutputStream().write(byteOs.toByteArray());
             }
         }
+    }
+
+    public void exit() {
+        exit = true;
+    }
+
+    public boolean isExit() {
+        return exit;
     }
 }

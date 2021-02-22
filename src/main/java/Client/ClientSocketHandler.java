@@ -3,7 +3,7 @@ package Client;
 import Client.Processor.ProcessComponent;
 import Client.TransferObject.*;
 import Data.Data;
-import Data.LogIOSignal;
+import Data.*;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -20,13 +20,12 @@ public class ClientSocketHandler {
     public ClientSocketHandler() {
         try {
             socket = new Socket(HOST, PORT);
-
-            signalProcess = new ClientSignalProcess(socket);
-
             socket.getOutputStream().flush();
 
             clientSendingObj = new Sending(socket);
             clientReceivingObj = new Receiving(socket);
+
+            signalProcess = new ClientSignalProcess(socket);
         } catch(IOException e) {
             e.printStackTrace();
         }
@@ -54,7 +53,7 @@ public class ClientSocketHandler {
         return message;
     }
 
-    public int getLocalPort() {
-        return socket.getLocalPort();
+    public Socket getSocket() {
+        return socket;
     }
 }

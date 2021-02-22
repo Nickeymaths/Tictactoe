@@ -4,21 +4,31 @@ import java.io.Serializable;
 
 public abstract class Data implements Serializable {
     private static final long serialVersionUID = 1L;
-    private int targetPORT;
+    private int receiverPORT;
+    private int senderPORT;
 
     public Data() {
 
     }
 
-    public Data(int targetPORT) {
-        this.targetPORT = targetPORT;
+    public Data(int receiverPORT, int senderPORT) {
+        this.receiverPORT = receiverPORT;
+        this.senderPORT = senderPORT;
     }
 
-    public void setPORT(int targetPORT) {
-        this.targetPORT = targetPORT;
+    public int getReceiverPORT() {
+        return receiverPORT;
     }
 
-    public int getTargetPORT() {
-        return targetPORT;
+    public void setReceiverPORT(int receiverPORT) {
+        this.receiverPORT = receiverPORT;
+    }
+
+    public int getSenderPORT() {
+        return senderPORT;
+    }
+
+    public void setSenderPORT(int senderPORT) {
+        this.senderPORT = senderPORT;
     }
 }

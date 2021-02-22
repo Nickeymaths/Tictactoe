@@ -3,9 +3,9 @@ package Client.Processor;
 import Client.Main;
 import Data.Data;
 
-public class LogIOSignalProcessor extends ProcessComponent {
+public class UpdateRoomSignalProcessor extends ProcessComponent {
     @Override
     public void process(Data data) {
-        Main.waitingRoom.updatePlayerTable();
+        Main.waitingRoom.updateRoomTable();
     }
 }

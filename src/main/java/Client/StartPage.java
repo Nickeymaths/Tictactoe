@@ -202,7 +202,7 @@ public class StartPage {
 
     public Account getAccount() {
         boolean sex = maleButton.isSelected()? Sex.MALE : Sex.FEMALE;
-        if (!Main.serverManage.isContain(usernameFieldReg.getText())) {
+        if (!Main.serverManage.isContains(usernameFieldReg.getText())) {
             if (passwordFieldReg.getText().equals(confirmPasswordReg.getText())) {
                 return new Account(usernameFieldReg.getText(), passwordFieldReg.getText()
                         , fullNameReg.getText(), sex, new Date(dateReg.getEditor().getText()));

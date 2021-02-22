@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -49,31 +50,6 @@ public class WaitingRoom {
 
         playerTable.getColumns().addAll(userNameCol, activeCol, inMatchCol);
 
-        playerTable.setRowFactory(new Callback<TableView<Account>, TableRow<Account>>() {
-            @Override
-            public TableRow<Account> call(TableView<Account> param) {
-                TableRow<Account> row = new TableRow<>();
-                ContextMenu contextMenu = new ContextMenu();
-
-                MenuItem invite = new Menu("Invite");
-
-                invite.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        // Code for invite request friend.
-
-                    }
-                });
-                contextMenu.getItems().add(invite);
-                row.contextMenuProperty().bind(
-                        Bindings.when(row.emptyProperty())
-                                .then((ContextMenu)null)
-                                .otherwise(contextMenu)
-                );
-                return row;
-            }
-        });
-
         playerTab.setContent(playerTable);
         // Client.Room tab
         Tab roomTab = new Tab("Room");
@@ -91,31 +67,6 @@ public class WaitingRoom {
 
         roomTable.getColumns().addAll(roomId, amount);
 
-        roomTable.setRowFactory(new Callback<TableView<Room>, TableRow<Room>>() {
-            @Override
-            public TableRow<Room> call(TableView<Room> param) {
-                TableRow<Room> row = new TableRow<>();
-                ContextMenu contextMenu = new ContextMenu();
-
-                MenuItem joinRoom = new Menu("Join room");
-                joinRoom.setOnAction(new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        // Code for join request
-
-                    }
-                });
-
-                contextMenu.getItems().add(joinRoom);
-                row.contextMenuProperty().bind(
-                        Bindings.when(row.emptyProperty())
-                                .then((ContextMenu)null)
-                                .otherwise(contextMenu)
-                );
-                return row;
-            }
-        });
-
         roomTab.setContent(roomTable);
 
         waitingTapPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
@@ -129,25 +80,10 @@ public class WaitingRoom {
         findMatchButton = new Button("Find match");
         createRoomButton = new Button("Create Room");
 
-        AnchorPane.setLeftAnchor(logoutButton, 14.0);
-        AnchorPane.setTopAnchor(logoutButton, 14.0);
-        AnchorPane.setBottomAnchor(logoutButton, 155.0);
-        AnchorPane.setRightAnchor(logoutButton, 946.0);
-
-        AnchorPane.setLeftAnchor(profileButton, 111.0);
-        AnchorPane.setTopAnchor(profileButton, 14.0);
-        AnchorPane.setBottomAnchor(profileButton, 155.0);
-        AnchorPane.setRightAnchor(profileButton, 839.0);
-
-        AnchorPane.setLeftAnchor(findMatchButton, 14.0);
-        AnchorPane.setTopAnchor(findMatchButton, 85.0);
-        AnchorPane.setBottomAnchor(findMatchButton, 84.0);
-        AnchorPane.setRightAnchor(findMatchButton, 596.0);
-
-        AnchorPane.setLeftAnchor(createRoomButton, 596.0);
-        AnchorPane.setTopAnchor(createRoomButton, 85.0);
-        AnchorPane.setBottomAnchor(createRoomButton, 84.0);
-        AnchorPane.setRightAnchor(createRoomButton, 14.0);
+        setPositionOnAnchorPane(logoutButton, 14,966,155,14);
+        setPositionOnAnchorPane(profileButton, 14,839,155,131);
+        setPositionOnAnchorPane(findMatchButton, 85,596,84,14);
+        setPositionOnAnchorPane(createRoomButton, 85,14,84,596);
 
         anchorPane.getChildren().addAll(logoutButton, profileButton
                 , findMatchButton, createRoomButton);
@@ -159,6 +95,13 @@ public class WaitingRoom {
         scene = new Scene(root, 1080, 720);
     }
 
+    public void setPositionOnAnchorPane(Node child, double top, double right, double bottom, double left) {
+        AnchorPane.setTopAnchor(child, top);
+        AnchorPane.setRightAnchor(child, right);
+        AnchorPane.setBottomAnchor(child, bottom);
+        AnchorPane.setLeftAnchor(child, left);
+    }
+
     public Button getLogoutButton() {
         return logoutButton;
     }
@@ -167,21 +110,29 @@ public class WaitingRoom {
         return createRoomButton;
     }
 
+    public TableView<Account> getPlayerTable() {
+        return playerTable;
+    }
+
+    public TableView<Room> getRoomTable() {
+        return roomTable;
+    }
+
     public Scene getScene() {
         return scene;
     }
 
     public void updatePlayerTable() {
-        System.out.println(playerTable.getItems());
         if (playerTable.getItems() != null) playerTable.getItems().clear();
         ObservableList<Account> activeAccounts = FXCollections.observableList(Main.serverManage.getActiveAccountList());
-        playerTable.setItems(activeAccounts);
+        System.out.println(activeAccounts.subList(0, activeAccounts.size()));
+        playerTable.getItems().setAll(activeAccounts);
     }
 
     public void updateRoomTable() {
         if (roomTable.getItems() != null) roomTable.getItems().clear();
         ObservableList<Room> roomsList = FXCollections.observableList(Main.serverManage.getRoomList());
-        System.out.println(roomsList);
-        roomTable.setItems(roomsList);
+        System.out.println("Number of room:" + roomsList.size());
+        roomTable.getItems().setAll(roomsList);
     }
 }

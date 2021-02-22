@@ -1,23 +1,37 @@
 package Client;
 
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
-import java.io.*;
+import java.io.FileInputStream;
 
 public class InGame {
     private final int N = 20;
+    private final int M = 19;
+
+    private Label roomIdLabel;
+    private Button newGameButton;
+    private Button quitButton;
+    private Label processingStateLabel;
+    private Label waitingStateLabel;
+    private ImageView player1Avatar;
+    private ImageView player2Avatar;
+    private Label username1;
+    private Label username2;
+    private Label timeLabel;
+    private TextArea messageView;
+    private TextField typingArea;
+    private Button sendButton;
+    private Button[][] squares;
+
     private Scene scene;
-    Button[][] buttons = new Button[N][N];
-    private boolean turn = Turn.PLAYER1_TURN;
-    private boolean hasNewTurn = true;
 
     public InGame() {
         try {
@@ -28,79 +42,150 @@ public class InGame {
     }
 
     public void initialLookAndFeel() throws Exception {
-        SplitPane splitFrame = new SplitPane();
-        GridPane boardGamePane = new GridPane();
-        VBox playerArea = new VBox();
+        AnchorPane mainPane = new AnchorPane();
+        AnchorPane featurePane = new AnchorPane();
+        AnchorPane boardPane = new AnchorPane();
+
+        // set structure
+        mainPane.getChildren().addAll(featurePane, boardPane);
+
+        mainPane.setPrefWidth(Main.WIDTH);
+        mainPane.setPrefHeight(Main.HEIGHT);
+
+        // Set position of concrete pane
+        setPositionOnAnchorPane(featurePane, 7,8,7,770);
+        setPositionOnAnchorPane(boardPane, 7, 324, 7, 7);
+
+        // Create feature Pane
+        featurePane.setStyle("-fx-background-color: #5d6d7e");
+
+        roomIdLabel = new Label("#room id");
+        roomIdLabel.setFont(new Font("Arial", 15));
+        roomIdLabel.setTextFill(Color.WHITESMOKE);
+        setPositionOnAnchorPane(roomIdLabel, 14, 235, 671, 21);
+
+        newGameButton = new Button("New game");
+        setPositionOnAnchorPane(newGameButton,64,174,608,22);
+
+        quitButton = new Button("Quit");
+        setPositionOnAnchorPane(quitButton,64,20,608,176);
+
+        processingStateLabel = new Label("Processing...");
+        processingStateLabel.setFont(new Font("Bell MT bold", 17));
+        processingStateLabel.setTextFill(Color.WHITESMOKE);
+        setPositionOnAnchorPane(processingStateLabel, 150,182,528,32);
+
+        waitingStateLabel = new Label("Waiting");
+        waitingStateLabel.setFont(new Font("Bell MT bold", 17));
+        waitingStateLabel.setTextFill(Color.WHITESMOKE);
+        setPositionOnAnchorPane(waitingStateLabel, 150, 43, 522,198);
+
+        player1Avatar = new ImageView();
+        setPositionOnAnchorPane(player1Avatar, 189, 184, 421, 30);
+        FileInputStream inputStream = new FileInputStream("src/main/Resource/icons8_magneto_96px.png");
+        player1Avatar.setImage(new Image(inputStream));
+
+        ImageView vsImage = new ImageView();
+        setPositionOnAnchorPane(vsImage, 227,136,444,136);
+        inputStream = new FileInputStream("src/main/Resource/icons8_sword_48px.png");
+        vsImage.setImage(new Image(inputStream));
+
+        player2Avatar = new ImageView();
+        setPositionOnAnchorPane(player2Avatar, 189, 29, 421, 185);
+        inputStream = new FileInputStream("src/main/Resource/icons8_spider-man_head_96px.png");
+        player2Avatar.setImage(new Image(inputStream));
+
+        username1 = new Label("Name 1");
+        username1.setFont(new Font("Arial bold italic", 15));
+        username1.setTextFill(Color.WHITESMOKE);
+        setPositionOnAnchorPane(username1, 321,202,366,47);
+
+        username2 = new Label("Name 2");
+        username2.setFont(new Font("Arial bold italic", 15));
+        username2.setTextFill(Color.WHITESMOKE);
+        setPositionOnAnchorPane(username2, 321, 50, 366, 199);
+
+        timeLabel = new Label("Timer");
+        timeLabel.setFont(new Font("Arial", 15));
+        timeLabel.setTextFill(Color.WHITESMOKE);
+        setPositionOnAnchorPane(timeLabel,319,132,364,140);
+
+        Label chatLabel = new Label("Chat");
+        chatLabel.setFont(new Font("Arial", 15));
+        chatLabel.setTextFill(Color.WHITESMOKE);
+        setPositionOnAnchorPane(chatLabel, 395, 260, 292,15);
+
+        messageView = new TextArea();
+        setPositionOnAnchorPane(messageView, 418,13,90,14);
+
+        typingArea = new TextField();
+        setPositionOnAnchorPane(typingArea,646,86,32,13);
+
+        sendButton = new Button("Send");
+        setPositionOnAnchorPane(sendButton,646,13,32,236);
+
+        featurePane.getChildren().addAll(
+                roomIdLabel,
+                newGameButton,
+                quitButton,
+                processingStateLabel,
+                waitingStateLabel,
+                player1Avatar,
+                player2Avatar,
+                vsImage,
+                username1,
+                username2,
+                timeLabel,
+                chatLabel,
+                messageView,
+                typingArea,
+                sendButton
+        );
+
+        // Create board pane
+        GridPane grid = new GridPane();
+
+        boardPane.getChildren().add(grid);
+
+        setPositionOnAnchorPane(grid, 5,0,5,0);
+        squares = new Button[M][N];
 
         for (int i = 0; i < N; i++) {
-            ColumnConstraints colConst = new ColumnConstraints();
-            colConst.setPercentWidth(100.0 / N);
-            boardGamePane.getColumnConstraints().add(colConst);
-        }
-        for (int i = 0; i < N; i++) {
-            RowConstraints rowConst = new RowConstraints();
-            rowConst.setPercentHeight(100.0 / N);
-            boardGamePane.getRowConstraints().add(rowConst);
+            grid.getColumnConstraints().add(new ColumnConstraints(37));
         }
 
-        for (int i = 0; i < N; i++) {
+        for (int i = 0; i < M; i++) {
+            grid.getRowConstraints().add(new RowConstraints(37));
+        }
+
+        for (int i = 0; i < M; i++) {
             for (int j = 0; j < N; j++) {
-                buttons[i][j] = new Button();
-                buttons[i][j].setPrefWidth(0.7*Main.WIDTH/N);
-                buttons[i][j].setPrefHeight(Main.HEIGHT/N);
-                boardGamePane.add(buttons[i][j], i, j);
+                squares[i][j] = new Button();
+                squares[i][j].setPrefWidth(37);
+                squares[i][j].setPrefHeight(37);
+                grid.add(squares[i][j], j,i);
             }
         }
 
-        splitFrame.getItems().add(boardGamePane);
-        splitFrame.getItems().add(playerArea);
-        splitFrame.setDividerPositions(0.7, 0.3);
+        scene = new Scene(mainPane);
+    }
 
-        boardGamePane.setPadding(new Insets(0,0,0,0));
-
-        boardGamePane.setMaxWidth(Main.WIDTH*0.7);
-        boardGamePane.setMinWidth(Main.WIDTH*0.7);
-
-        boardGamePane.setMinHeight(Main.HEIGHT);
-        boardGamePane.setMaxHeight(Main.HEIGHT);
-
-        GridPane boardInfoArea = new GridPane();
-
-        Label board = new Label("#Board");
-        Label time = new Label("Time");
-
-        Label player1 = new Label();
-        FileInputStream player1_Img = new FileInputStream("src/main/Resource/player1.jpg");
-        player1.setGraphic(new ImageView(new Image(player1_Img)));
-        Label player1Time = new Label("#1 time");
-
-        Label player2 = new Label();
-        FileInputStream player2_Img = new FileInputStream("src/main/Resource/player2.jpg");
-        player2.setGraphic(new ImageView(new Image(player2_Img)));
-        Label player2Time = new Label("#2 time");
-
-        boardInfoArea.add(board, 0, 0);
-        boardInfoArea.add(time, 1, 0);
-        boardInfoArea.add(player1, 0, 2);
-        boardInfoArea.add(player1Time, 0, 3);
-        boardInfoArea.add(player2, 1, 2);
-        boardInfoArea.add(player2Time, 1, 3);
-        board.setAlignment(Pos.CENTER);
-
-        TextArea chatArea = new TextArea();
-
-        TextField chatType = new TextField();
-
-        playerArea.getChildren().addAll(boardInfoArea, chatArea, chatType);
-
-        scene = new Scene(splitFrame, Main.WIDTH, Main.HEIGHT);
+    public void setPositionOnAnchorPane(Node child, double top, double right, double bottom, double left) {
+        AnchorPane.setTopAnchor(child, top);
+        AnchorPane.setRightAnchor(child, right);
+        AnchorPane.setBottomAnchor(child, bottom);
+        AnchorPane.setLeftAnchor(child, left);
     }
 
     public Scene getScene() {
         return scene;
     }
 
-    public void setTurn(boolean turn) {
+    public Button getQuitButton() {
+        return quitButton;
+    }
+
+/*    public void setTurn(boolean turn) {
         this.turn = turn;
     }
 
@@ -113,7 +198,7 @@ public class InGame {
                 mouseClickEvent[i][j] = new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        /*try {
+                        *//*try {
                             if (Main.clientSocket.getInputStream().available() != 0) {
                                 byte[] reader = new byte[4096];
                                 Main.clientSocket.getInputStream().read(reader);
@@ -124,43 +209,43 @@ public class InGame {
                                 hasNewTurn = true;
                             } else {
                                 hasNewTurn = false;
-                            }*/
+                            }*//*
 
 //                            if (hasNewTurn) {
-                                if (turn == Turn.PLAYER1_TURN) {
-                                    // Mark X
-                                    buttons[finalI][finalJ].setText("X");
-                                    buttons[finalI][finalJ].setStyle("-fx-text-fill: red; -fx-font: normal bold 18px 'serif';");
-                                    System.out.println(checkWin(finalI, finalJ, "X"));
-                                } else {
-                                    // Mark Y
-                                    buttons[finalI][finalJ].setText("O");
-                                    buttons[finalI][finalJ].setStyle("-fx-text-fill: blue; -fx-font: normal bold 18px 'serif';");
-                                    System.out.println(checkWin(finalI, finalJ, "O"));
-                                }
-                                turn = !turn;
-                                /*String message = String.valueOf(finalI) + (finalJ);
+                        if (turn == Turn.PLAYER1_TURN) {
+                            // Mark X
+                            buttons[finalI][finalJ].setText("X");
+                            buttons[finalI][finalJ].setStyle("-fx-text-fill: red; -fx-font: normal bold 18px 'serif';");
+                            System.out.println(checkWin(finalI, finalJ, "X"));
+                        } else {
+                            // Mark Y
+                            buttons[finalI][finalJ].setText("O");
+                            buttons[finalI][finalJ].setStyle("-fx-text-fill: blue; -fx-font: normal bold 18px 'serif';");
+                            System.out.println(checkWin(finalI, finalJ, "O"));
+                        }
+                        turn = !turn;
+                                *//*String message = String.valueOf(finalI) + (finalJ);
 
                                 ByteArrayOutputStream byteOs = new ByteArrayOutputStream(4096);
                                 ObjectOutputStream ObjOs = new ObjectOutputStream(byteOs);
                                 ObjOs.writeObject(message);
-                                Main.clientSocket.getOutputStream().write(byteOs.toByteArray());*/
+                                Main.clientSocket.getOutputStream().write(byteOs.toByteArray());*//*
 //                            }
-                        /*} catch(Exception e) {
+                        *//*} catch(Exception e) {
                             e.printStackTrace();
-                        }*/
+                        }*//*
                     }
                 };
                 buttons[i][j].addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickEvent[i][j]);
             }
         }
-    }
+    }*/
 
     public boolean checkWin(int i , int j, String mark) {
         int count = 0;
         // Check left
         for (int n = j; n >= 0; n--) {
-            if (buttons[i][n].getText().equals(mark)) {
+            if (squares[i][n].getText().equals(mark)) {
                 count++;
             } else {
                 break;
@@ -168,7 +253,7 @@ public class InGame {
         }
         // Check right
         for (int n = j + 1; n < N; n++) {
-            if (buttons[i][n].getText().equals(mark)) {
+            if (squares[i][n].getText().equals(mark)) {
                 count++;
             } else {
                 break;
@@ -178,7 +263,7 @@ public class InGame {
         count = 0;
         // Check top
         for (int m = i; m >= 0; m--) {
-            if (buttons[m][j].getText().equals(mark)) {
+            if (squares[m][j].getText().equals(mark)) {
                 count++;
             } else {
                 break;
@@ -186,7 +271,7 @@ public class InGame {
         }
         // Check right
         for (int m = i + 1; m < N; m++) {
-            if (buttons[m][j].getText().equals(mark)) {
+            if (squares[m][j].getText().equals(mark)) {
                 count++;
             } else {
                 break;
@@ -196,7 +281,7 @@ public class InGame {
         count = 0;
         // Check top-left
         for (int m = 0; m < N; m++) {
-            if (i >= m && j >= m && buttons[i-m][j-m].getText().equals(mark)) {
+            if (i >= m && j >= m && squares[i-m][j-m].getText().equals(mark)) {
                 count++;
             } else {
                 break;
@@ -204,7 +289,7 @@ public class InGame {
         }
         // Check bottom-right
         for (int m = 1; m < N; m++) {
-            if (i+m < N && j+m < N && buttons[i+m][j+m].getText().equals(mark)) {
+            if (i+m < N && j+m < N && squares[i+m][j+m].getText().equals(mark)) {
                 count++;
             } else {
                 break;
@@ -214,7 +299,7 @@ public class InGame {
         count = 0;
         // Check top-right.
         for (int m = 0; m < N; m++) {
-            if (i >= m && j+m < N && buttons[i-m][j+m].getText().equals(mark)) {
+            if (i >= m && j+m < N && squares[i-m][j+m].getText().equals(mark)) {
                 count++;
             } else {
                 break;
@@ -222,7 +307,7 @@ public class InGame {
         }
         // Check bottom-left
         for (int m = 1; m < N; m++) {
-            if (i+m < N && j >= m && buttons[i+m][j-m].getText().equals(mark)) {
+            if (i+m < N && j >= m && squares[i+m][j-m].getText().equals(mark)) {
                 count++;
             } else {
                 break;
@@ -232,3 +317,15 @@ public class InGame {
         return false;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
