@@ -7,6 +7,7 @@ import Server.Room;
 import Server.ServerManage;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
@@ -20,7 +21,7 @@ public class Main extends Application {
     public static  final int HEIGHT = 770;
     public static final int WIDTH = 1110;
     private StartPage startPage = new StartPage();
-    private InGame gameFramework = new InGame();
+    public static InGame gameFramework = new InGame();
     public static WaitingRoom waitingRoom = new WaitingRoom();
     private ClientSocketHandler clientSocketHandler;
     public static ServerManage serverManage = new ServerManage();
@@ -171,7 +172,6 @@ public class Main extends Application {
                     @Override
                     public void handle(ActionEvent event) {
                         // Code for invite request friend.
-
                     }
                 });
                 contextMenu.getItems().add(invite);
@@ -196,7 +196,34 @@ public class Main extends Application {
                     @Override
                     public void handle(ActionEvent event) {
                         // Code for join request
+                        TablePosition tablePosition = waitingRoom
+                                .getRoomTable()
+                                .getSelectionModel()
+                                .getSelectedCells()
+                                .get(0);
+                        int rowPosition = tablePosition.getRow();
+                        Room selectedRoom = waitingRoom
+                                .getRoomTable()
+                                .getItems()
+                                .get(rowPosition);
+                        if (selectedRoom.getAmount() >= 2) {
+                            // Room has enough player
+                        } else {
+                            try {
+                                clientSocketHandler.send(
+                                        new JointRoomRequest(
+                                                currentAccount.getUsername(),
+                                                selectedRoom.getId(),
+                                                selectedRoom.getOwnerPort(),
+                                                clientSocketHandler.getSocket().getLocalPort()
+                                        )
+                                );
 
+                                primaryStage.setScene(gameFramework.getScene());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 });
 

@@ -40,12 +40,20 @@ public class ServerManage {
         return db.getAccount(username);
     }
 
+    public Room getRoom(int roomId) {
+        return db.getRoom(roomId);
+    }
+
     public void updateActiveState(String username, boolean isActive) {
         db.UPDATE_ACTIVE_STATE(username, isActive);
     }
 
     public void updateInMatchState(String username, boolean isInMatch) {
         db.UPDATE_IN_GAME_STATE(username, isInMatch);
+    }
+
+    public void updateRoom(Room room) {
+        db.UPDATE(room);
     }
 
     public Room createRoom(String usernameOfOwner, int ownerPort) {

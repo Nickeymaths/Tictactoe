@@ -1,5 +1,6 @@
 package Client;
 
+import Server.Room;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -198,7 +199,7 @@ public class InGame {
                 mouseClickEvent[i][j] = new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        *//*try {
+                        try {
                             if (Main.clientSocket.getInputStream().available() != 0) {
                                 byte[] reader = new byte[4096];
                                 Main.clientSocket.getInputStream().read(reader);
@@ -209,7 +210,7 @@ public class InGame {
                                 hasNewTurn = true;
                             } else {
                                 hasNewTurn = false;
-                            }*//*
+                            }
 
 //                            if (hasNewTurn) {
                         if (turn == Turn.PLAYER1_TURN) {
@@ -224,22 +225,36 @@ public class InGame {
                             System.out.println(checkWin(finalI, finalJ, "O"));
                         }
                         turn = !turn;
-                                *//*String message = String.valueOf(finalI) + (finalJ);
+                                String message = String.valueOf(finalI) + (finalJ);
 
                                 ByteArrayOutputStream byteOs = new ByteArrayOutputStream(4096);
                                 ObjectOutputStream ObjOs = new ObjectOutputStream(byteOs);
                                 ObjOs.writeObject(message);
-                                Main.clientSocket.getOutputStream().write(byteOs.toByteArray());*//*
+                                Main.clientSocket.getOutputStream().write(byteOs.toByteArray());
 //                            }
-                        *//*} catch(Exception e) {
+                        } catch(Exception e) {
                             e.printStackTrace();
-                        }*//*
+                        }
                     }
                 };
                 buttons[i][j].addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickEvent[i][j]);
             }
         }
     }*/
+
+
+
+    public void updateRoom(Room room) {
+        roomIdLabel.setText("#" + room.getId());
+        roomIdLabel.setFont(new Font("Arial", 15));
+        roomIdLabel.setTextFill(Color.WHITESMOKE);
+        username1.setText(room.getUsernameOfOwner());
+        username1.setFont(new Font("Arial bold italic", 15));
+        username1.setTextFill(Color.WHITESMOKE);
+        username2.setText(room.getUsernameOfOther());
+        username2.setFont(new Font("Arial bold italic", 15));
+        username2.setTextFill(Color.WHITESMOKE);
+    }
 
     public boolean checkWin(int i , int j, String mark) {
         int count = 0;

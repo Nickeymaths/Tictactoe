@@ -63,6 +63,8 @@ public class ServerWorkComponent extends Thread {
             for (Socket socket : ServerSocketHandler.socketList.values()) {
                 if (!socket.isClosed()) socket.getOutputStream().write(byteOs.toByteArray());
             }
+        } else {
+            ServerSocketHandler.socketList.get(message.getReceiverPORT()).getOutputStream().write(byteOs.toByteArray());
         }
     }
 

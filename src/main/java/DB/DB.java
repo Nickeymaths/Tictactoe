@@ -150,6 +150,48 @@ public class DB {
         }
     }
 
+    public void UPDATE(Room room) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE Room SET "
+                            + "Id = " + room.getId()
+                            + ", Amount = " + room.getAmount()
+                            + ", OwnerUsername = '" + room.getUsernameOfOwner()
+                            + "', OtherUsername = '" + room.getUsernameOfOther()
+                            + "', OwnerPort = " + room.getOwnerPort()
+                            + ", OtherPort = " + room.getOtherPort()
+                    + " WHERE Id = " + room.getId()
+            );
+            statement.executeUpdate();
+        } catch(SQLException e) {
+            System.out.println("Error to update room");
+            e.printStackTrace();
+        }
+    }
+
+    public Room getRoom(int roomId) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT* FROM Room WHERE Id = " + roomId
+            );
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                return new Room(
+                        result.getInt("Id"),
+                        result.getInt("Amount"),
+                        result.getString("OwnerUsername"),
+                        result.getString("OtherUsername"),
+                        result.getInt("OwnerPort"),
+                        result.getInt("OtherPort")
+                );
+            }
+        } catch (SQLException e) {
+            System.out.println("Error to select room");
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public List<Room> getRooms() {
         List<Room> roomList = null;
         try {
