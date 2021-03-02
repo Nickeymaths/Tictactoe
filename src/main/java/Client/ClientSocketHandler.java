@@ -14,7 +14,6 @@ public class ClientSocketHandler {
     private Socket socket;
     private Sending clientSendingObj;
     private Receiving clientReceivingObj;
-    private ProcessComponent processor;
     private ClientSignalProcess signalProcess;
 
     public ClientSocketHandler() {
@@ -33,14 +32,6 @@ public class ClientSocketHandler {
 
     public void activeSignalProcess() {
         signalProcess.start();
-    }
-
-    public void processMessage(Data message) {
-        processor.process(message);
-    }
-
-    public void setProcessor(ProcessComponent processor) {
-        this.processor = processor;
     }
 
     public void send(Data message) throws IOException {

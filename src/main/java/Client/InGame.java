@@ -31,6 +31,8 @@ public class InGame {
     private TextField typingArea;
     private Button sendButton;
     private Button[][] squares;
+    private boolean turn;
+    private boolean isYourTurn = false;
 
     private Scene scene;
 
@@ -186,11 +188,35 @@ public class InGame {
         return quitButton;
     }
 
-/*    public void setTurn(boolean turn) {
+    public void setTurn(boolean turn) {
         this.turn = turn;
     }
 
-    public void run() {
+    public boolean getTurn() {
+        return turn;
+    }
+    
+    public boolean isYourTurn() {
+        return isYourTurn;
+    }
+    
+    public void setPlayPermission(boolean isYourTurn) {
+        this.isYourTurn = isYourTurn;
+    }
+
+    public int getNumberOfRow() {
+        return M;
+    }
+
+    public int getNumberOfColumn() {
+        return N;
+    }
+
+    public Button[][] getBoard() {
+        return squares;
+    }
+
+  /*  public void run() {
         EventHandler<MouseEvent>[][] mouseClickEvent = new EventHandler[N][N];
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
@@ -241,7 +267,6 @@ public class InGame {
             }
         }
     }*/
-
 
 
     public void updateRoom(Room room) {

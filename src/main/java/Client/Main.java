@@ -132,6 +132,7 @@ public class Main extends Application {
 
                 currentRoom = serverManage.createRoom(currentAccount.getUsername(), clientSocketHandler.getSocket().getLocalPort());
                 waitingRoom.updateRoomTable();
+                gameFramework.setTurn(Turn.PLAYER1_TURN);
                 try {
                     //Sending create signal
                     clientSocketHandler.send(new CreateRoomSignal(clientSocketHandler.getSocket().getLocalPort()));
@@ -218,7 +219,7 @@ public class Main extends Application {
                                                 clientSocketHandler.getSocket().getLocalPort()
                                         )
                                 );
-
+                                gameFramework.setTurn(Turn.PLAYER2_TURN);
                                 primaryStage.setScene(gameFramework.getScene());
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -238,6 +239,49 @@ public class Main extends Application {
         });
 
         startPage.getLoginButton().addEventHandler(MouseEvent.MOUSE_CLICKED, loginClick);
+
+        int M = gameFramework.getNumberOfRow();
+        int N = gameFramework.getNumberOfColumn();
+        EventHandler<MouseEvent>[][] mouseClickEvent = new EventHandler[M][N];
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                int finalI = i;
+                int finalJ = j;
+                mouseClickEvent[i][j] = new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        try {
+                            if (gameFramework.isYourTurn()) {
+                                if (gameFramework.getTurn() == Turn.PLAYER1_TURN) {
+                                    // Mark X
+                                    gameFramework.getBoard()[finalI][finalJ].setText("X");
+                                    gameFramework.getBoard()[finalI][finalJ].setStyle("-fx-text-fill: red; -fx-font: normal bold 18px 'serif';");
+                                    System.out.println(gameFramework.checkWin(finalI, finalJ, "X"));
+                                } else {
+                                    // Mark Y
+                                    gameFramework.getBoard()[finalI][finalJ].setText("O");
+                                    gameFramework.getBoard()[finalI][finalJ].setStyle("-fx-text-fill: blue; -fx-font: normal bold 18px 'serif';");
+                                    System.out.println(gameFramework.checkWin(finalI, finalJ, "O"));
+                                }
+
+                                gameFramework.setPlayPermission(false);
+                                clientSocketHandler.send(
+                                        new PlayerTurnMessage(
+                                                gameFramework.getTurn(),
+                                                finalJ, finalI,
+                                                currentRoom.getOpponentPort(clientSocketHandler.getSocket().getLocalPort()),
+                                                clientSocketHandler.getSocket().getLocalPort()
+                                        )
+                                );
+                            }
+                        } catch(Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                gameFramework.getBoard()[i][j].addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickEvent[i][j]);
+            }
+        }
 
         primaryStage.setWidth(WIDTH);
         primaryStage.setMaxHeight(HEIGHT);

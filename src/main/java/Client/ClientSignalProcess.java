@@ -1,5 +1,6 @@
 package Client;
 
+import Client.Processor.PlayerTurnProcessor;
 import Client.Processor.UpdateAccountTableSignalProcessor;
 import Client.Processor.UpdateRoomTableSignalProcessor;
 import Client.Processor.ProcessComponent;
@@ -16,6 +17,7 @@ public class ClientSignalProcess extends Thread {
     private Socket socket;
     private ProcessComponent updateAccountTableSignal_processor;
     private ProcessComponent updateRoomTableSignal_processor;
+    private ProcessComponent playerTurn_processor;
 
     public ClientSignalProcess(Socket socket) {
         this.socket = socket;
@@ -23,6 +25,7 @@ public class ClientSignalProcess extends Thread {
         sender = new Sending(socket);
         updateAccountTableSignal_processor = new UpdateAccountTableSignalProcessor();
         updateRoomTableSignal_processor = new UpdateRoomTableSignalProcessor();
+        playerTurn_processor = new PlayerTurnProcessor();
     }
 
     @Override
@@ -45,6 +48,7 @@ public class ClientSignalProcess extends Thread {
                     Main.currentRoom.setAmount(Main.currentRoom.getAmount()+1);
                     Main.currentRoom.setUsernameOfOther(request.getUsername());
                     Main.currentRoom.setOtherPort(request.getSenderPORT());
+                    Main.gameFramework.setPlayPermission(true);
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
@@ -64,6 +68,8 @@ public class ClientSignalProcess extends Thread {
                             Main.gameFramework.updateRoom(Main.currentRoom);
                         }
                     });
+                } else if (data instanceof PlayerTurnMessage) {
+                    playerTurn_processor.process(data);
                 }
             }
             System.out.println("Close socket" + socket);

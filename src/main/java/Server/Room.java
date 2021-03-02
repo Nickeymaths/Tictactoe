@@ -68,4 +68,15 @@ public class Room {
     public int getOtherPort() {
         return otherPort;
     }
+
+    /**
+     * Return player who has port number=port 's opponent port number
+     * @param port
+     * @return
+     */
+    public int getOpponentPort(int port) {
+        if (port == ownerPort) return otherPort;
+        else if (port == otherPort) return ownerPort;
+        return -1;
+    }
 }
