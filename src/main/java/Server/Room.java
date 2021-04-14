@@ -4,20 +4,25 @@ public class Room {
     private int id;
     private int amount;
     private String usernameOfOwner;
+    private String avatarOfOwner;
     private String usernameOfOther;
+    private String avatarOfOther;
     private int ownerPort;
     private int otherPort;
 
-    public Room(int id, int amount, String usernameOfOwner, int ownerPort) {
+    public Room(int id, int amount, String usernameOfOwner, String avatarOfOwner, int ownerPort) {
         this.id = id;
         this.amount = amount;
         this.usernameOfOwner = usernameOfOwner;
+        this.avatarOfOwner = avatarOfOwner;
         this.ownerPort = ownerPort;
     }
 
-    public Room(int id, int amount, String usernameOfOwner, String usernameOfOther, int ownerPort, int otherPort) {
-        this(id, amount, usernameOfOwner, ownerPort);
+    public Room(int id, int amount, String usernameOfOwner, String avatarOfOwner,
+                String usernameOfOther, String avatarOfOther, int ownerPort, int otherPort) {
+        this(id, amount, usernameOfOwner, avatarOfOwner, ownerPort);
         this.usernameOfOther = usernameOfOther;
+        this.avatarOfOther = avatarOfOther;
         this.otherPort = otherPort;
     }
 
@@ -69,6 +74,22 @@ public class Room {
         return otherPort;
     }
 
+    public void setAvatarOfOwner(String avatarOfOwner) {
+        this.avatarOfOwner = avatarOfOwner;
+    }
+
+    public String getAvatarOfOwner() {
+        return avatarOfOwner;
+    }
+
+    public void setAvatarOfOther(String avatarOfOther) {
+        this.avatarOfOther = avatarOfOther;
+    }
+
+    public String getAvatarOfOther() {
+        return avatarOfOther;
+    }
+
     /**
      * Return player who has port number=port 's opponent port number
      * @param port
@@ -78,5 +99,15 @@ public class Room {
         if (port == ownerPort) return otherPort;
         else if (port == otherPort) return ownerPort;
         return -1;
+    }
+
+    public String getOpponentUsername(String username) {
+        if (username.equals(usernameOfOwner)) {
+            return usernameOfOther;
+        }
+        if (username.equals(usernameOfOther)) {
+            return usernameOfOwner;
+        }
+        return null;
     }
 }

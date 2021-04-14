@@ -1,6 +1,7 @@
 package Client;
 
 import Server.Room;
+import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -12,22 +13,25 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 public class InGame {
     private final int N = 20;
     private final int M = 19;
 
+    private long startTime;
+
     private Label roomIdLabel;
     private Button newGameButton;
     private Button quitButton;
-    private Label processingStateLabel;
-    private Label waitingStateLabel;
+    private Label timeLabel1;
+    private Label timeLabel2;
     private ImageView player1Avatar;
     private ImageView player2Avatar;
     private Label username1;
     private Label username2;
-    private Label timeLabel;
-    private TextArea messageView;
+    private VBox messageView;
     private TextField typingArea;
     private Button sendButton;
     private Button[][] squares;
@@ -73,19 +77,19 @@ public class InGame {
         quitButton = new Button("Quit");
         setPositionOnAnchorPane(quitButton,64,20,608,176);
 
-        processingStateLabel = new Label("Processing...");
-        processingStateLabel.setFont(new Font("Bell MT bold", 17));
-        processingStateLabel.setTextFill(Color.WHITESMOKE);
-        setPositionOnAnchorPane(processingStateLabel, 150,182,528,32);
+        timeLabel1 = new Label("");
+        timeLabel1.setFont(new Font("Bell MT bold", 17));
+        timeLabel1.setTextFill(Color.WHITESMOKE);
+        setPositionOnAnchorPane(timeLabel1, 150,182,528,32);
 
-        waitingStateLabel = new Label("Waiting");
-        waitingStateLabel.setFont(new Font("Bell MT bold", 17));
-        waitingStateLabel.setTextFill(Color.WHITESMOKE);
-        setPositionOnAnchorPane(waitingStateLabel, 150, 43, 522,198);
+        timeLabel2 = new Label("");
+        timeLabel2.setFont(new Font("Bell MT bold", 17));
+        timeLabel2.setTextFill(Color.WHITESMOKE);
+        setPositionOnAnchorPane(timeLabel2, 150, 43, 522,198);
 
         player1Avatar = new ImageView();
         setPositionOnAnchorPane(player1Avatar, 189, 184, 421, 30);
-        FileInputStream inputStream = new FileInputStream("src/main/Resource/icons8_magneto_96px.png");
+        FileInputStream inputStream = new FileInputStream("src/main/Resource/avatar/icons8_confusion_96px.png");
         player1Avatar.setImage(new Image(inputStream));
 
         ImageView vsImage = new ImageView();
@@ -95,7 +99,7 @@ public class InGame {
 
         player2Avatar = new ImageView();
         setPositionOnAnchorPane(player2Avatar, 189, 29, 421, 185);
-        inputStream = new FileInputStream("src/main/Resource/icons8_spider-man_head_96px.png");
+        inputStream = new FileInputStream("src/main/Resource/avatar/icons8_confusion_96px.png");
         player2Avatar.setImage(new Image(inputStream));
 
         username1 = new Label("Name 1");
@@ -108,18 +112,17 @@ public class InGame {
         username2.setTextFill(Color.WHITESMOKE);
         setPositionOnAnchorPane(username2, 321, 50, 366, 199);
 
-        timeLabel = new Label("Timer");
-        timeLabel.setFont(new Font("Arial", 15));
-        timeLabel.setTextFill(Color.WHITESMOKE);
-        setPositionOnAnchorPane(timeLabel,319,132,364,140);
-
         Label chatLabel = new Label("Chat");
         chatLabel.setFont(new Font("Arial", 15));
         chatLabel.setTextFill(Color.WHITESMOKE);
         setPositionOnAnchorPane(chatLabel, 395, 260, 292,15);
 
-        messageView = new TextArea();
-        setPositionOnAnchorPane(messageView, 418,13,90,14);
+        ScrollPane scrollPane = new ScrollPane();
+        messageView = new VBox();
+        messageView.setStyle("-fx-background-color: #ffffff");
+
+        scrollPane.setContent(messageView);
+        setPositionOnAnchorPane(scrollPane, 418,13,90,14);
 
         typingArea = new TextField();
         setPositionOnAnchorPane(typingArea,646,86,32,13);
@@ -131,16 +134,15 @@ public class InGame {
                 roomIdLabel,
                 newGameButton,
                 quitButton,
-                processingStateLabel,
-                waitingStateLabel,
+                timeLabel1,
+                timeLabel2,
                 player1Avatar,
                 player2Avatar,
                 vsImage,
                 username1,
                 username2,
-                timeLabel,
                 chatLabel,
-                messageView,
+                scrollPane,
                 typingArea,
                 sendButton
         );
@@ -171,6 +173,38 @@ public class InGame {
         }
 
         scene = new Scene(mainPane);
+    }
+
+
+    public void startGame() {
+        startTime = System.nanoTime();
+        AnimationTimer timer = new AnimationTimer() {
+            @Override
+            public void handle(long now) {
+                long timeDuring = (now -  startTime)/1000000000;
+                long minus = timeDuring/60;
+                long second = timeDuring % 60;
+
+                if (isYourTurn) {
+                    if (turn == Turn.PLAYER1_TURN){
+                        timeLabel1.setText(String.format("%02d:%02d", minus, second));
+                        timeLabel2.setText("");
+                    } else {
+                        timeLabel2.setText(String.format("%02d:%02d", minus, second));
+                        timeLabel1.setText("");
+                    }
+                } else {
+                    if (turn == Turn.PLAYER1_TURN){
+                        timeLabel2.setText(String.format("%02d:%02d", minus, second));
+                        timeLabel1.setText("");
+                    } else {
+                        timeLabel1.setText(String.format("%02d:%02d", minus, second));
+                        timeLabel2.setText("");
+                    }
+                }
+            }
+        };
+        timer.start();
     }
 
     public void setPositionOnAnchorPane(Node child, double top, double right, double bottom, double left) {
@@ -216,58 +250,39 @@ public class InGame {
         return squares;
     }
 
-  /*  public void run() {
-        EventHandler<MouseEvent>[][] mouseClickEvent = new EventHandler[N][N];
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < N; j++) {
-                int finalI = i;
-                int finalJ = j;
-                mouseClickEvent[i][j] = new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        try {
-                            if (Main.clientSocket.getInputStream().available() != 0) {
-                                byte[] reader = new byte[4096];
-                                Main.clientSocket.getInputStream().read(reader);
-                                ByteArrayInputStream byteIs = new ByteArrayInputStream(reader);
-                                ObjectInputStream ObjIs = new ObjectInputStream(byteIs);
-                                String comeData = (String) ObjIs.readObject();
-                                System.out.println("Server say: " + comeData);
-                                hasNewTurn = true;
-                            } else {
-                                hasNewTurn = false;
-                            }
+    public TextField getTypingArea() {
+        return typingArea;
+    }
 
-//                            if (hasNewTurn) {
-                        if (turn == Turn.PLAYER1_TURN) {
-                            // Mark X
-                            buttons[finalI][finalJ].setText("X");
-                            buttons[finalI][finalJ].setStyle("-fx-text-fill: red; -fx-font: normal bold 18px 'serif';");
-                            System.out.println(checkWin(finalI, finalJ, "X"));
-                        } else {
-                            // Mark Y
-                            buttons[finalI][finalJ].setText("O");
-                            buttons[finalI][finalJ].setStyle("-fx-text-fill: blue; -fx-font: normal bold 18px 'serif';");
-                            System.out.println(checkWin(finalI, finalJ, "O"));
-                        }
-                        turn = !turn;
-                                String message = String.valueOf(finalI) + (finalJ);
+    public Button getSendButton() {
+        return sendButton;
+    }
 
-                                ByteArrayOutputStream byteOs = new ByteArrayOutputStream(4096);
-                                ObjectOutputStream ObjOs = new ObjectOutputStream(byteOs);
-                                ObjOs.writeObject(message);
-                                Main.clientSocket.getOutputStream().write(byteOs.toByteArray());
-//                            }
-                        } catch(Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-                buttons[i][j].addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickEvent[i][j]);
-            }
+    public VBox getMessageView() {
+        return messageView;
+    }
+
+    public void resetStartTime() {
+        startTime = System.nanoTime();
+    }
+
+    public void setPlayer1Avatar(String avatarUrl) {
+        try {
+            FileInputStream inputStream = new FileInputStream(avatarUrl);
+            player1Avatar.setImage(new Image(inputStream));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-    }*/
+    }
 
+    public void setPlayer2Avatar(String avatarUrl) {
+        try {
+            FileInputStream inputStream = new FileInputStream(avatarUrl);
+            player2Avatar.setImage(new Image(inputStream));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void updateRoom(Room room) {
         roomIdLabel.setText("#" + room.getId());
@@ -279,6 +294,8 @@ public class InGame {
         username2.setText(room.getUsernameOfOther());
         username2.setFont(new Font("Arial bold italic", 15));
         username2.setTextFill(Color.WHITESMOKE);
+        setPlayer1Avatar(room.getAvatarOfOwner());
+        setPlayer2Avatar(room.getAvatarOfOther());
     }
 
     public boolean checkWin(int i , int j, String mark) {

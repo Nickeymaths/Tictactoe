@@ -35,7 +35,7 @@ public class DB {
         try {
             PreparedStatement preparedStatement_accountTable = connection.prepareStatement(
                     "INSERT INTO Account(Username, Password, FullName, " +
-                            "DOB, Male, WinMatch, LossMatch, isActive, isInMatch) Value(?,?,?,?,?,?,?,?,?)");
+                            "DOB, Male, WinMatch, LossMatch, isActive, isInMatch, avatar) Value(?,?,?,?,?,?,?,?,?,?)");
             preparedStatement_accountTable.setString(1, account.getUsername());
             preparedStatement_accountTable.setString(2, account.getPassword());
             preparedStatement_accountTable.setString(3, account.getFullName());
@@ -45,6 +45,7 @@ public class DB {
             preparedStatement_accountTable.setInt(7, account.getLossMatch());
             preparedStatement_accountTable.setBoolean(8, account.isActive());
             preparedStatement_accountTable.setBoolean(9, account.isInMatch());
+            preparedStatement_accountTable.setString(10, account.getImageIconLink());
             preparedStatement_accountTable.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -67,7 +68,10 @@ public class DB {
                 int lossMatch = result.getInt("LossMatch");
                 boolean active = result.getBoolean("isActive");
                 boolean inMatch = result.getBoolean("isInMatch");
-                return new Account(username, password, fullName, isMale, birthday, winMatch, lossMatch, active, inMatch);
+                String avatar = result.getString("avatar");
+                Account account = new Account(username, password, fullName, isMale, birthday, winMatch, lossMatch, active, inMatch);
+                account.setImageIconLink(avatar);
+                return account;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -123,14 +127,16 @@ public class DB {
     public void INSERT(Room room) {
         try {
             PreparedStatement preparedStatement_roomTable = connection.prepareStatement(
-                    "INSERT INTO Room(Id, Amount, OwnerUsername, " +
-                            "OtherUsername, OwnerPort, OtherPort) Value(?,?,?,?,?,?)");
+                    "INSERT INTO Room(Id, Amount, OwnerUsername, AvatarOfOwner, " +
+                            "OtherUsername, AvatarOfOther, OwnerPort, OtherPort) Value(?,?,?,?,?,?,?,?)");
             preparedStatement_roomTable.setInt(1, room.getId());
             preparedStatement_roomTable.setInt(2, room.getAmount());
             preparedStatement_roomTable.setString(3, room.getUsernameOfOwner());
-            preparedStatement_roomTable.setString(4, room.getUsernameOfOther());
-            preparedStatement_roomTable.setInt(5, room.getOwnerPort());
-            preparedStatement_roomTable.setInt(6, room.getOtherPort());
+            preparedStatement_roomTable.setString(4,room.getAvatarOfOwner());
+            preparedStatement_roomTable.setString(5, room.getUsernameOfOther());
+            preparedStatement_roomTable.setString(6, room.getAvatarOfOther());
+            preparedStatement_roomTable.setInt(7, room.getOwnerPort());
+            preparedStatement_roomTable.setInt(8, room.getOtherPort());
             preparedStatement_roomTable.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -157,7 +163,9 @@ public class DB {
                             + "Id = " + room.getId()
                             + ", Amount = " + room.getAmount()
                             + ", OwnerUsername = '" + room.getUsernameOfOwner()
+                            + "', AvatarOfOwner = '" + room.getAvatarOfOwner()
                             + "', OtherUsername = '" + room.getUsernameOfOther()
+                            + "', AvatarOfOther = '" + room.getAvatarOfOther()
                             + "', OwnerPort = " + room.getOwnerPort()
                             + ", OtherPort = " + room.getOtherPort()
                     + " WHERE Id = " + room.getId()
@@ -180,7 +188,9 @@ public class DB {
                         result.getInt("Id"),
                         result.getInt("Amount"),
                         result.getString("OwnerUsername"),
+                        result.getString("AvatarOfOwner"),
                         result.getString("OtherUsername"),
+                        result.getString("AvatarOfOther"),
                         result.getInt("OwnerPort"),
                         result.getInt("OtherPort")
                 );
@@ -203,10 +213,13 @@ public class DB {
                 int id = result.getInt("Id");
                 int amount = result.getInt("Amount");
                 String usernameOfOwner = result.getString("OwnerUsername");
+                String avatarOfOwner = result.getString("AvatarOfOwner");
                 String usernameOfOther = result.getString("OtherUsername");
+                String avatarOfOther = result.getString("AvatarOfOther");
                 int ownerPort = result.getInt("OwnerPort");
                 int otherPort = result.getInt("OtherPort");
-                Room room = new Room(id, amount, usernameOfOwner, usernameOfOther, ownerPort, otherPort);
+                Room room = new Room(id, amount, usernameOfOwner, avatarOfOwner, usernameOfOther,
+                        avatarOfOther, ownerPort, otherPort);
                 roomList.add(room);
             }
         } catch (Exception e) {

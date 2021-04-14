@@ -7,7 +7,11 @@ import Client.Processor.ProcessComponent;
 import Client.TransferObject.Receiving;
 import Client.TransferObject.Sending;
 import Data.*;
+import IndividualInformation.Account;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Paint;
 
 import java.net.Socket;
 
@@ -49,10 +53,14 @@ public class ClientSignalProcess extends Thread {
                     Main.currentRoom.setUsernameOfOther(request.getUsername());
                     Main.currentRoom.setOtherPort(request.getSenderPORT());
                     Main.gameFramework.setPlayPermission(true);
+
+                    Account player2 = Main.serverManage.getAccount(request.getUsername());
+                    Main.currentRoom.setAvatarOfOther(player2.getImageIconLink());
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
                             Main.gameFramework.updateRoom(Main.currentRoom);
+                            Main.gameFramework.startGame();
                         }
                     });
                     Main.serverManage.updateRoom(Main.currentRoom);
@@ -62,14 +70,27 @@ public class ClientSignalProcess extends Thread {
                     JointRoomAccept jointRoomAccept = (JointRoomAccept) data;
 
                     Main.currentRoom = Main.serverManage.getRoom(jointRoomAccept.getRoomId());
+                    Main.currentRoom.setAvatarOfOther(Main.currentAccount.getImageIconLink());
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
                             Main.gameFramework.updateRoom(Main.currentRoom);
+                            Main.gameFramework.startGame();
                         }
                     });
                 } else if (data instanceof PlayerTurnMessage) {
                     playerTurn_processor.process(data);
+                } else if (data instanceof ChatMessage) {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            Label message = new Label("[" + ((ChatMessage) data).getUsernameOfSender() + "]" + ((ChatMessage) data).getMessage());
+                            message.setPrefWidth(240);
+                            message.setTextFill(Paint.valueOf("#2350ab"));
+                            message.setAlignment(Pos.CENTER_RIGHT);
+                            Main.gameFramework.getMessageView().getChildren().add(message);
+                        }
+                    });
                 }
             }
             System.out.println("Close socket" + socket);

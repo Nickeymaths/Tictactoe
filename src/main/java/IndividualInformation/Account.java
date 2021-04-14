@@ -15,7 +15,7 @@ public class Account implements Serializable {
     private boolean male;
     private int winMatch;
     private int lossMatch;
-    private Image imageIcon;
+    private String imageIconLink;
     private boolean active;
     private boolean inMatch;
 
@@ -76,6 +76,10 @@ public class Account implements Serializable {
         return inMatch;
     }
 
+    public void setImageIconLink(String imageIconLink) {
+        this.imageIconLink = imageIconLink;
+    }
+
     @Override
     public String toString() {
         return "Account[Username = " + username + ", Password = " + password + ", FullName = " + fullName
@@ -98,6 +102,11 @@ public class Account implements Serializable {
         return birthday;
     }
 
+
+    public String getImageIconLink() {
+        return imageIconLink;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -108,6 +117,6 @@ public class Account implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, password, fullName, birthday, male, winMatch, lossMatch, imageIcon, active, inMatch);
+        return Objects.hash(username, password, fullName, birthday, male, winMatch, lossMatch, imageIconLink, active, inMatch);
     }
 }

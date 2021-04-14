@@ -2,6 +2,7 @@ package Client;
 
 import IndividualInformation.Account;
 import Server.Room;
+import javafx.animation.AnimationTimer;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

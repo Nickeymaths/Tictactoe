@@ -56,9 +56,9 @@ public class ServerManage {
         db.UPDATE(room);
     }
 
-    public Room createRoom(String usernameOfOwner, int ownerPort) {
+    public Room createRoom(String usernameOfOwner, String avatarOfOwner, int ownerPort) {
         // Room id is socket port of owner
-        Room newRoom = new Room(ownerPort, 1, usernameOfOwner, ownerPort);
+        Room newRoom = new Room(ownerPort, 1, usernameOfOwner, avatarOfOwner, ownerPort);
         db.INSERT(newRoom);
         number_of_room++;
         return newRoom;

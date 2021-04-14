@@ -10,6 +10,7 @@ import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -27,6 +28,7 @@ public class Main extends Application {
     public static ServerManage serverManage = new ServerManage();
 
     public static Account currentAccount;
+    private String accountAvatarLink = "src/main/Resource/avatar/icons8_confusion_96px.png";
     public static Room currentRoom;
 
     @Override
@@ -48,9 +50,13 @@ public class Main extends Application {
         EventHandler<MouseEvent> registerClick = new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+
                 primaryStage.setScene(startPage.getLoginScene());
                 Account newPlayer = startPage.getAccount();
                 if (newPlayer != null) {
+                    newPlayer.setImageIconLink(accountAvatarLink);
+                    System.out.println(accountAvatarLink);
+
                     serverManage.insertIntoDB(newPlayer);
                     startPage.resetRegisterPage();
                     System.out.println(newPlayer);
@@ -58,6 +64,16 @@ public class Main extends Application {
             }
         };
         startPage.getRegisterButton().addEventHandler(MouseEvent.MOUSE_CLICKED, registerClick);
+
+        for (int i = 0; i < startPage.getAvatarMenu().getItems().size(); i++) {
+            int finalI = i;
+            startPage.getAvatarMenu().getItems().get(i).setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    accountAvatarLink = startPage.getAvatarList().get(finalI);
+                }
+            });
+        }
 
         EventHandler<MouseEvent> loginClick = new EventHandler<MouseEvent>() {
             @Override
@@ -130,9 +146,12 @@ public class Main extends Application {
             public void handle(MouseEvent event) {
                 primaryStage.setScene(gameFramework.getScene());
 
-                currentRoom = serverManage.createRoom(currentAccount.getUsername(), clientSocketHandler.getSocket().getLocalPort());
+                currentRoom = serverManage.createRoom(currentAccount.getUsername(),
+                        currentAccount.getImageIconLink(), clientSocketHandler.getSocket().getLocalPort());
                 waitingRoom.updateRoomTable();
                 gameFramework.setTurn(Turn.PLAYER1_TURN);
+                gameFramework.setPlayer1Avatar(currentAccount.getImageIconLink());
+
                 try {
                     //Sending create signal
                     clientSocketHandler.send(new CreateRoomSignal(clientSocketHandler.getSocket().getLocalPort()));
@@ -265,6 +284,7 @@ public class Main extends Application {
                                 }
 
                                 gameFramework.setPlayPermission(false);
+                                gameFramework.resetStartTime();
                                 clientSocketHandler.send(
                                         new PlayerTurnMessage(
                                                 gameFramework.getTurn(),
@@ -282,6 +302,35 @@ public class Main extends Application {
                 gameFramework.getBoard()[i][j].addEventHandler(MouseEvent.MOUSE_CLICKED, mouseClickEvent[i][j]);
             }
         }
+
+        EventHandler<MouseEvent> sendMessageEvent = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                try {
+                    if (currentRoom != null && currentRoom.getAmount() == 2) {
+                        clientSocketHandler.send(
+                                new ChatMessage(
+                                        gameFramework.getTypingArea().getText(),
+                                        currentRoom.getOpponentUsername(currentAccount.getUsername()),
+                                        currentRoom.getOpponentPort(clientSocketHandler.getSocket().getLocalPort()),
+                                        currentAccount.getUsername(),
+                                        clientSocketHandler.getSocket().getLocalPort())
+                        );
+
+                        Label message = new Label("[" + currentAccount.getUsername() +  "]"
+                                + gameFramework.getTypingArea().getText());
+                        message.setPrefWidth(240);
+                        message.setAlignment(Pos.CENTER_LEFT);
+                        gameFramework.getMessageView().getChildren().add(message);
+
+                        gameFramework.getTypingArea().clear();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        gameFramework.getSendButton().addEventHandler(MouseEvent.MOUSE_CLICKED, sendMessageEvent);
 
         primaryStage.setWidth(WIDTH);
         primaryStage.setMaxHeight(HEIGHT);

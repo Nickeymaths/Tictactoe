@@ -4,12 +4,14 @@ import IndividualInformation.Account;
 import IndividualInformation.Date;
 import IndividualInformation.Sex;
 import javafx.collections.ObservableList;;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
@@ -17,11 +19,16 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 public class StartPage {
     private boolean isLogging = true;
+
+    private List<String> avatarList;
 
     private Label usernameLabelLogin;
     private Label passwordLabelLogin;
@@ -44,6 +51,7 @@ public class StartPage {
     private Scene registerScene;
     private RadioButton maleButton;
     private RadioButton femaleButton;
+    private MenuButton avatarMenu;
 
     public void initial() throws IOException {
         usernameLabelLogin = new Label("Username");
@@ -95,12 +103,23 @@ public class StartPage {
         usernameFieldReg.setPromptText("Username");
         usernameFieldReg.setMinWidth(400);
 
-        Button checkButton = new Button("Check");
+        avatarMenu = new MenuButton("Avatar");
+        String folderPath = "src/main/Resource/avatar";
+        File avatarFolder = new File(folderPath);
+        avatarList = Arrays.asList(avatarFolder.list());
+        for (int i = 0; i < avatarList.size(); i++) {
+            avatarList.set(i, folderPath + "/" + avatarList.get(i));
+            FileInputStream imageInput = new FileInputStream(avatarList.get(i));
+            ImageView image = new ImageView(new Image(imageInput));
+
+            MenuItem avatarItem = new MenuItem("", image);
+            avatarMenu.getItems().add(avatarItem);
+        }
 
         HBox usernameRow = new HBox();
         usernameRow.setSpacing(60);
         usernameRow.getChildren().add(usernameFieldReg);
-        usernameRow.getChildren().add(checkButton);
+        usernameRow.getChildren().add(avatarMenu);
 
         passwordFieldReg = new PasswordField();
         passwordFieldReg.setPromptText("Password");
@@ -145,25 +164,6 @@ public class StartPage {
         registerScene = new Scene(registerPane);
     }
 
-    public void run(Stage stage) {
-        stage.setScene(loginScene);
-        EventHandler<MouseEvent> createAccountClick = new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                stage.setScene(registerScene);
-            }
-        };
-        createAccountButton.addEventHandler(MouseEvent.MOUSE_CLICKED, createAccountClick);
-
-        EventHandler<MouseEvent> registerClick = new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                stage.setScene(loginScene);
-            }
-        };
-        registerButton.addEventHandler(MouseEvent.MOUSE_CLICKED, registerClick);
-    }
-
     public Scene getLoginScene() {
         return loginScene;
     }
@@ -198,6 +198,14 @@ public class StartPage {
 
     public PasswordField getPasswordFieldLogin() {
         return passwordFieldLogin;
+    }
+
+    public MenuButton getAvatarMenu() {
+        return avatarMenu;
+    }
+
+    public List<String> getAvatarList() {
+        return avatarList;
     }
 
     public Account getAccount() {
