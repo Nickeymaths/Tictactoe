@@ -111,6 +111,10 @@ public class WaitingRoom {
         return createRoomButton;
     }
 
+    public Button getFindMatchButton() {
+        return findMatchButton;
+    }
+
     public TableView<Account> getPlayerTable() {
         return playerTable;
     }

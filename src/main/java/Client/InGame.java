@@ -12,6 +12,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
+import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -23,7 +24,7 @@ public class InGame {
     private long startTime;
 
     private Label roomIdLabel;
-    private Button newGameButton;
+    private Button makeDrawButton;
     private Button quitButton;
     private Label timeLabel1;
     private Label timeLabel2;
@@ -35,8 +36,17 @@ public class InGame {
     private TextField typingArea;
     private Button sendButton;
     private Button[][] squares;
+    private Button giveUpButton;
     private boolean turn;
     private boolean isYourTurn = false;
+
+    private String defaultAvatarLink = "src/main/Resource/avatar/icons8_confusion_96px.png";
+    private String defaultNameOfPlayer1 = "Player 1";
+    private String defaultNameOfPlayer2 = "Player 2";
+
+    private AnimationTimer timer;
+
+    private boolean started = false;
 
     private Scene scene;
 
@@ -71,11 +81,14 @@ public class InGame {
         roomIdLabel.setTextFill(Color.WHITESMOKE);
         setPositionOnAnchorPane(roomIdLabel, 14, 235, 671, 21);
 
-        newGameButton = new Button("New game");
-        setPositionOnAnchorPane(newGameButton,64,174,608,22);
+        makeDrawButton = new Button("Draw");
+        setPositionOnAnchorPane(makeDrawButton,64,174,608,22);
 
         quitButton = new Button("Quit");
         setPositionOnAnchorPane(quitButton,64,20,608,176);
+
+        giveUpButton = new Button("Give up");
+        setPositionOnAnchorPane(giveUpButton, 109, 97, 563, 99);
 
         timeLabel1 = new Label("");
         timeLabel1.setFont(new Font("Bell MT bold", 17));
@@ -89,7 +102,7 @@ public class InGame {
 
         player1Avatar = new ImageView();
         setPositionOnAnchorPane(player1Avatar, 189, 184, 421, 30);
-        FileInputStream inputStream = new FileInputStream("src/main/Resource/avatar/icons8_confusion_96px.png");
+        FileInputStream inputStream = new FileInputStream(defaultAvatarLink);
         player1Avatar.setImage(new Image(inputStream));
 
         ImageView vsImage = new ImageView();
@@ -99,15 +112,15 @@ public class InGame {
 
         player2Avatar = new ImageView();
         setPositionOnAnchorPane(player2Avatar, 189, 29, 421, 185);
-        inputStream = new FileInputStream("src/main/Resource/avatar/icons8_confusion_96px.png");
+        inputStream = new FileInputStream(defaultAvatarLink);
         player2Avatar.setImage(new Image(inputStream));
 
-        username1 = new Label("Name 1");
+        username1 = new Label(defaultNameOfPlayer1);
         username1.setFont(new Font("Arial bold italic", 15));
         username1.setTextFill(Color.WHITESMOKE);
         setPositionOnAnchorPane(username1, 321,202,366,47);
 
-        username2 = new Label("Name 2");
+        username2 = new Label(defaultNameOfPlayer2);
         username2.setFont(new Font("Arial bold italic", 15));
         username2.setTextFill(Color.WHITESMOKE);
         setPositionOnAnchorPane(username2, 321, 50, 366, 199);
@@ -132,8 +145,9 @@ public class InGame {
 
         featurePane.getChildren().addAll(
                 roomIdLabel,
-                newGameButton,
+                makeDrawButton,
                 quitButton,
+                giveUpButton,
                 timeLabel1,
                 timeLabel2,
                 player1Avatar,
@@ -178,7 +192,7 @@ public class InGame {
 
     public void startGame() {
         startTime = System.nanoTime();
-        AnimationTimer timer = new AnimationTimer() {
+        timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 long timeDuring = (now -  startTime)/1000000000;
@@ -205,6 +219,12 @@ public class InGame {
             }
         };
         timer.start();
+        started = true;
+    }
+
+    public void stopGame() {
+        timer.stop();
+        started = false;
     }
 
     public void setPositionOnAnchorPane(Node child, double top, double right, double bottom, double left) {
@@ -221,6 +241,11 @@ public class InGame {
     public Button getQuitButton() {
         return quitButton;
     }
+
+    public Button getGiveUpButton() {
+        return giveUpButton;
+    }
+
 
     public void setTurn(boolean turn) {
         this.turn = turn;
@@ -262,6 +287,26 @@ public class InGame {
         return messageView;
     }
 
+    public Label getRoomIdLabel() {
+        return roomIdLabel;
+    }
+
+    public Label getUsername1() {
+        return username1;
+    }
+
+    public Label getUsername2() {
+        return username2;
+    }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public Button getMakeDrawButton() {
+        return makeDrawButton;
+    }
+
     public void resetStartTime() {
         startTime = System.nanoTime();
     }
@@ -281,6 +326,23 @@ public class InGame {
             player2Avatar.setImage(new Image(inputStream));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void resetGameBoard() {
+        username1.setText(defaultNameOfPlayer1);
+        username2.setText(defaultNameOfPlayer2);
+        setPlayer1Avatar(defaultAvatarLink);
+        setPlayer2Avatar(defaultAvatarLink);
+        timeLabel1.setText("");
+        timeLabel2.setText("");
+        messageView.getChildren().clear();
+        typingArea.clear();
+
+        for (int i = 0; i < squares.length; i++) {
+            for (int j = 0; j < squares[i].length; j++) {
+                squares[i][j].setText("");
+            }
         }
     }
 

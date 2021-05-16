@@ -35,7 +35,7 @@ public class DB {
         try {
             PreparedStatement preparedStatement_accountTable = connection.prepareStatement(
                     "INSERT INTO Account(Username, Password, FullName, " +
-                            "DOB, Male, WinMatch, LossMatch, isActive, isInMatch, avatar) Value(?,?,?,?,?,?,?,?,?,?)");
+                            "DOB, Male, numb_win, num_loss, isOnline, isPlaying, avatar) Value(?,?,?,?,?,?,?,?,?,?)");
             preparedStatement_accountTable.setString(1, account.getUsername());
             preparedStatement_accountTable.setString(2, account.getPassword());
             preparedStatement_accountTable.setString(3, account.getFullName());
@@ -64,10 +64,10 @@ public class DB {
                 String fullName = result.getString("FullName");
                 Date birthday = new Date(result.getString("DOB"));
                 boolean isMale = result.getBoolean("Male");
-                int winMatch = result.getInt("WinMatch");
-                int lossMatch = result.getInt("LossMatch");
-                boolean active = result.getBoolean("isActive");
-                boolean inMatch = result.getBoolean("isInMatch");
+                int winMatch = result.getInt("num_win");
+                int lossMatch = result.getInt("num_loss");
+                boolean active = result.getBoolean("isOnline");
+                boolean inMatch = result.getBoolean("isPlaying");
                 String avatar = result.getString("avatar");
                 Account account = new Account(username, password, fullName, isMale, birthday, winMatch, lossMatch, active, inMatch);
                 account.setImageIconLink(avatar);
@@ -84,11 +84,11 @@ public class DB {
         Statement statement = null;
         try {
             statement = connection.createStatement();
-            statement.executeUpdate("update account set isActive = " + state
+            statement.executeUpdate("update account set isOnline = " + state
                     + " where username = '" + username + "';");
         } catch(Exception e) {
             e.printStackTrace();
-            System.out.println("Error to update isActive state");
+            System.out.println("Error to update isOnline state");
         }
     }
 
@@ -96,7 +96,7 @@ public class DB {
         Statement statement = null;
         try {
             statement = connection.createStatement();
-            statement.executeUpdate("update account set isInGame = " + state
+            statement.executeUpdate("update account set isPlaying = " + state
                     + " where username = '" + username + "';");
         } catch(Exception e) {
             e.printStackTrace();
@@ -111,7 +111,7 @@ public class DB {
             usernameList = new ArrayList<>();
             activeAccountList = new ArrayList<>();
 
-            PreparedStatement statement = connection.prepareStatement("SELECT Username FROM Account WHERE isActive = true;");
+            PreparedStatement statement = connection.prepareStatement("SELECT Username FROM Account WHERE isOnline = true;");
             ResultSet result =  statement.executeQuery();
             while (result.next()) {
                 Account account = getAccount(result.getString("Username"));

@@ -33,7 +33,10 @@ public class ServerWorkComponent extends Thread {
                     }
                 }
             }
-        } catch(Exception e) {
+        } catch(IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            System.out.println("Class not found exception");
             e.printStackTrace();
         }
     }
@@ -59,7 +62,7 @@ public class ServerWorkComponent extends Thread {
                 if (!socket.isClosed()) socket.getOutputStream().write(byteOs.toByteArray());
             }
             if (message instanceof LogoutSignal) exit();
-        } else if (message instanceof CreateRoomSignal || message instanceof QuitRoomSignal) {
+        } else if (message instanceof CreateRoomSignal || message instanceof UpdateRoomSignal) {
             for (Socket socket : ServerSocketHandler.socketList.values()) {
                 if (!socket.isClosed()) socket.getOutputStream().write(byteOs.toByteArray());
             }

@@ -1,11 +1,10 @@
 package Data;
 
-public class QuitRoomSignal extends Data {
+public class UpdateRoomSignal extends Data {
     private static final long serialVersionUID = 1L;
     private int room_id;
 
-    public QuitRoomSignal(int room_id, int receiverPORT, int senderPORT) {
-        super(receiverPORT, senderPORT);
+    public UpdateRoomSignal(int room_id) {
         this.room_id = room_id;
     }
 
@@ -15,8 +14,8 @@ public class QuitRoomSignal extends Data {
 
     @Override
     public String toString() {
-        return "QuitRoomSignal{" +
-                ", room_id=" + room_id +
+        return "UpdateRoomSignal{" +
+                "room_id=" + room_id +
                 '}';
     }
 }

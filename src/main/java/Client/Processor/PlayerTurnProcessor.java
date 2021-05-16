@@ -13,14 +13,10 @@ public class PlayerTurnProcessor extends ProcessComponent {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                if (message.getTurn() == Turn.PLAYER1_TURN) {
-                    Main.gameFramework.getBoard()[posY][posX].setText("X");
-                    Main.gameFramework.getBoard()[posY][posX].setStyle("-fx-text-fill: red; -fx-font: normal bold 18px 'serif';");
-                } else {
-                    Main.gameFramework.getBoard()[posY][posX].setText("O");
-                    Main.gameFramework.getBoard()[posY][posX].setStyle("-fx-text-fill: blue; -fx-font: normal bold 18px 'serif';");
-                }
-                Main.gameFramework.setPlayPermission(true);
+                Main.gameFramework.getBoard()[posY][posX].setText(Main.currentRoom.getSymbol(message.getUsername()));
+                Main.gameFramework.getBoard()[posY][posX].setStyle(Main.currentRoom.getColorSymbol(Main.currentRoom.getSymbol(message.getUsername())));
+//                Main.gameFramework.setPlayPermission(true);
+                Main.currentRoom.setCurrentTurn(Main.currentAccount.getUsername());
                 Main.gameFramework.resetStartTime();
             }
         });

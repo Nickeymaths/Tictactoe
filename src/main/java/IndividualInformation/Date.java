@@ -13,6 +13,7 @@ public class Date implements Serializable {
     }
 
     public Date(String s) {
+        System.out.println(s);
         if (!s.isEmpty()) {
             String[] part = s.split("/");
             dd = Integer.parseInt(part[0]);

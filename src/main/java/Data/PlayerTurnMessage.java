@@ -3,23 +3,23 @@ package Data;
 public class PlayerTurnMessage extends Data {
     private static final long serialVersionUID = 1L;
 
-    private boolean turn;
+    private String username;
     private int posX;
     private int posY;
 
-    public PlayerTurnMessage(boolean turn, int posX, int posY, int receiverPort, int senderPort) {
+    public PlayerTurnMessage(String username, int posX, int posY, int receiverPort, int senderPort) {
         super(receiverPort, senderPort);
-        this.turn = turn;
+        this.username = username;
         this.posX = posX;
         this.posY = posY;
     }
 
-    public boolean getTurn() {
-        return turn;
+    public String getUsername() {
+        return username;
     }
 
-    public void setTurn(boolean turn) {
-        this.turn = turn;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public int getPosX() {
