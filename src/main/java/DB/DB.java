@@ -156,6 +156,27 @@ public class DB {
         }
     }
 
+    public void UPDATE(Account account) {
+        try {
+            System.out.println(account.getUsername());
+            PreparedStatement statement = connection.prepareStatement(
+                    "UPDATE account SET "
+                            + "FullName = '" + account.getFullName()
+                            + "', DOB = '" + account.getDOB()
+                            + "', Male = " + account.isMale()
+                            + ", num_win = " + account.getWinMatch()
+                            + ", num_loss = " + account.getLossMatch()
+                            + ", isOnline = " + account.isActive()
+                            + ", isPlaying = " + account.isInMatch()
+                            + " Where Username = '" + account.getUsername() + "'"
+            );
+            statement.executeUpdate();
+        } catch(SQLException e) {
+            System.out.println("Error to update room");
+            e.printStackTrace();
+        }
+    }
+
     public void UPDATE(Room room) {
         try {
             PreparedStatement statement = connection.prepareStatement(

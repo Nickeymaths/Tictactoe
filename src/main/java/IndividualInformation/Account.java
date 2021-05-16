@@ -48,7 +48,23 @@ public class Account implements Serializable {
         winMatch = number;
      }
 
-     public void setLossMatch(int number) {
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    public void setMale(boolean male) {
+        this.male = male;
+    }
+
+    public void setLossMatch(int number) {
         lossMatch = number;
      }
 

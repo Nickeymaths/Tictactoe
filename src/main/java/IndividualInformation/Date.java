@@ -16,9 +16,9 @@ public class Date implements Serializable {
         System.out.println(s);
         if (!s.isEmpty()) {
             String[] part = s.split("/");
-            dd = Integer.parseInt(part[0]);
+            mm = Integer.parseInt(part[0]);
             dd = Integer.parseInt(part[1]);
-            dd = Integer.parseInt(part[2]);
+            yy = Integer.parseInt(part[2]);
         }
     }
 
@@ -48,6 +48,6 @@ public class Date implements Serializable {
 
     @Override
     public String toString() {
-        return dd + "/" + mm + "/" + yy;
+        return mm + "/" + dd + "/" + yy;
     }
 }

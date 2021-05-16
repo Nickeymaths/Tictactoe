@@ -3,6 +3,7 @@ package Client;
 import Data.CreateRoomSignal;
 import Data.*;
 import IndividualInformation.Account;
+import IndividualInformation.Date;
 import Server.Room;
 import Server.ServerManage;
 import javafx.application.Application;
@@ -32,6 +33,7 @@ public class Main extends Application {
     private String defaultAvatarLink = "src/main/Resource/avatar/icons8_confusion_96px.png";
     public static Room currentRoom;
     private Stage primaryStage;
+    private Profile profile = new Profile();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -54,8 +56,8 @@ public class Main extends Application {
             });
         }
 
-        primaryStage.setWidth(WIDTH);
-        primaryStage.setMaxHeight(HEIGHT);
+//        primaryStage.setWidth(WIDTH);
+//        primaryStage.setMaxHeight(HEIGHT);
         primaryStage.setResizable(false);
         primaryStage.show();
     }
@@ -104,6 +106,7 @@ public class Main extends Application {
                 currentAccount.setActive(false);
 
                 serverManage.delete(clientSocketHandler.getSocket().getLocalPort());
+                serverManage.updateAccount(currentAccount);
                 try {
                     clientSocketHandler.send(new LogoutSignal(currentAccount.getUsername(),false,
                             false, clientSocketHandler.getSocket().getLocalPort(), clientSocketHandler.getSocket().getLocalPort()));
@@ -335,6 +338,10 @@ public class Main extends Application {
                 MakeDrawAction();
             }
         });
+
+        waitingRoom.getProfileButton().setOnAction(event -> {
+            editProfileEvent();
+        });
     }
 
     public void loginAction() {
@@ -344,6 +351,14 @@ public class Main extends Application {
                 currentAccount = serverManage.getAccount(startPage.getUserNameLogin());
                 if (currentAccount != null && currentAccount.getPassword().equals(startPage.getPasswordLogin())) {
                     primaryStage.setScene(waitingRoom.getScene());
+
+                    profile.setAccountAvatar(currentAccount.getImageIconLink());
+                    profile.getUsernameField().setText(currentAccount.getUsername());
+                    profile.getFullNameField().setText(currentAccount.getFullName());
+                    profile.getDobField().getEditor().setText(currentAccount.getDOB().toString());
+                    profile.getWinRateLabel().setText("Win rate: " + (currentAccount.getWinMatch()*1.0/(currentAccount.getWinMatch()+ currentAccount.getLossMatch())));
+                    profile.getTotalMatchLabel().setText("Total match: " + (currentAccount.getWinMatch()+ currentAccount.getLossMatch()));
+                    profile.getMaleLabel().setText(currentAccount.isMale()? "Male": "Female");
                     // Update data base
                     currentAccount.setActive(true);
 
@@ -520,6 +535,25 @@ public class Main extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void editProfileEvent() {
+        primaryStage.setHeight(600);
+        primaryStage.setWidth(800);
+
+        primaryStage.setScene(profile.getProfileScene());
+
+        profile.getSaveProfileButton().setOnAction(event -> {
+           currentAccount.setFullName(profile.getFullNameField().getText());
+           currentAccount.setBirthday(new Date(profile.getDobField().getEditor().getText()));
+        });
+
+        profile.getCancelProfileButton().setOnAction(event -> {
+            primaryStage.setHeight(HEIGHT);
+            primaryStage.setWidth(WIDTH);
+
+            primaryStage.setScene(waitingRoom.getScene());
+        });
     }
 
     public static void main(String[] args) {

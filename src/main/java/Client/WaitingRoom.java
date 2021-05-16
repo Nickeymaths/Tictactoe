@@ -33,6 +33,14 @@ public class WaitingRoom {
         initialLookAndFeel();
     }
 
+    public Button getProfileButton() {
+        return profileButton;
+    }
+
+    public void setProfileButton(Button profileButton) {
+        this.profileButton = profileButton;
+    }
+
     public void initialLookAndFeel() {
         Tab playerTab = new Tab("Player Online");
         waitingTapPane.getTabs().add(playerTab);

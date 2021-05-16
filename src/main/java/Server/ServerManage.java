@@ -76,4 +76,8 @@ public class ServerManage {
     public int getNumberOfRoom() {
         return number_of_room;
     }
+
+    public void updateAccount(Account account) {
+        db.UPDATE(account);
+    }
 }
