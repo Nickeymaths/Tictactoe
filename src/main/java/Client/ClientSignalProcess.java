@@ -145,7 +145,7 @@ public class ClientSignalProcess extends Thread {
                             requestRematchAlert.showAndWait().ifPresent(response->{
                                 try {
                                     if (response == rematchButton) {
-                                        if (endGameAlert != null) endGameAlert.hide();
+                                        if (endGameAlert != null) endGameAlert.hide(); endGameAlert.close();
 
                                         Main.gameFramework.resetGameBoard();
                                         Main.gameFramework.getUsername1().setText(Main.currentRoom.getUsernameOfOwner());
@@ -156,6 +156,8 @@ public class ClientSignalProcess extends Thread {
 
                                         Main.currentRoom.setGoFirst(requestRematch.getGoFirst());
                                         Main.currentRoom.setCurrentTurn(Main.currentRoom.getGoFirst());
+                                        Main.gameFramework.stopGame();
+                                        Main.gameFramework.resetStartTime();
                                         Main.gameFramework.startGame();
 
                                             sender.send(new RematchResponseSignal(
@@ -190,6 +192,8 @@ public class ClientSignalProcess extends Thread {
 
                                 Main.currentRoom.setGoFirst(Main.currentRoom.getOpponentUsername(Main.currentRoom.getGoFirst()));
                                 Main.currentRoom.setCurrentTurn(Main.currentRoom.getGoFirst());
+                                Main.gameFramework.stopGame();
+                                Main.gameFramework.resetStartTime();
                                 Main.gameFramework.startGame();
                             } else {
 
@@ -206,6 +210,8 @@ public class ClientSignalProcess extends Thread {
                     Platform.runLater(new Runnable() {
                         @Override
                         public void run() {
+                            Main.gameFramework.stopGame();
+                            Main.gameFramework.resetStartTime();
                             Main.currentRoom.setWinner(endGameSignal.getWinner());
 
                             endGameAlert = new Alert(Alert.AlertType.INFORMATION);

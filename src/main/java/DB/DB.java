@@ -35,7 +35,7 @@ public class DB {
         try {
             PreparedStatement preparedStatement_accountTable = connection.prepareStatement(
                     "INSERT INTO Account(Username, Password, FullName, " +
-                            "DOB, Male, numb_win, num_loss, isOnline, isPlaying, avatar) Value(?,?,?,?,?,?,?,?,?,?)");
+                            "DOB, Male, num_win, num_loss, isOnline, isPlaying, avatar) Value(?,?,?,?,?,?,?,?,?,?)");
             preparedStatement_accountTable.setString(1, account.getUsername());
             preparedStatement_accountTable.setString(2, account.getPassword());
             preparedStatement_accountTable.setString(3, account.getFullName());

@@ -438,6 +438,9 @@ public class Main extends Application {
         alert.getButtonTypes().addAll(rematchButton, outGame);
         alert.setHeaderText(null);
 
+        gameFramework.stopGame();
+        gameFramework.resetStartTime();
+
         try {
             clientSocketHandler.send(new EndGameSignal(
                     currentRoom.getWinner(),
